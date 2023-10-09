@@ -4,9 +4,7 @@ import com.ctsgroup.nl.dashretry.models.Project;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface ProjectRepository extends BaseRepository<Project, Long, JpaSpecificationExecutor<Project>>{
+public interface ProjectRepository extends BaseRepository<Project, Long, JpaSpecificationExecutor<Project>> {
     Project getProjectById(Long id);
 }

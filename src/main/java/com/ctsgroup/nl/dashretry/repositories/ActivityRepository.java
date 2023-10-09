@@ -8,6 +8,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ActivityRepository extends BaseRepository<Activity, Long, JpaSpecificationExecutor<Activity>>{
+public interface ActivityRepository extends BaseRepository<Activity, Long, JpaSpecificationExecutor<Activity>> {
     List<Activity> findByProjectIdAndTimestampBetween(Long projectId, LocalDateTime startTime, LocalDateTime endTime);
 }

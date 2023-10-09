@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TaskRepository extends BaseRepository<Task, Long, JpaSpecificationExecutor<Task>>{
-        Task getTaskById(Long id);
+public interface TaskRepository extends BaseRepository<Task, Long, JpaSpecificationExecutor<Task>> {
+    Task getTaskById(Long id);
 }

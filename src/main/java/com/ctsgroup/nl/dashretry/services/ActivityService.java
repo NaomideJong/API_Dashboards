@@ -1,15 +1,15 @@
 package com.ctsgroup.nl.dashretry.services;
 
+import com.ctsgroup.nl.dashretry.models.Activity;
 import com.ctsgroup.nl.dashretry.models.SyncToken;
 import com.ctsgroup.nl.dashretry.repositories.ActivityRepository;
 import com.ctsgroup.nl.dashretry.repositories.ProjectRepository;
 import com.ctsgroup.nl.dashretry.repositories.SyncTokenRepository;
+import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
-import com.ctsgroup.nl.dashretry.models.Activity;
-import io.github.cdimascio.dotenv.Dotenv;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -28,20 +28,17 @@ import java.util.Optional;
 @Service
 public class ActivityService {
 
+    Dotenv dotenv = Dotenv.configure().load();
+    String apiKey = dotenv.get("ASANA_API_KEY");
     @Autowired
     private ActivityRepository activityRepository;
-
     @Autowired
     private ProjectRepository projectRepository;
-
     @Autowired
     private SyncTokenRepository syncTokenRepository;
 
-    Dotenv dotenv = Dotenv.configure().load();
-    String apiKey = dotenv.get("ASANA_API_KEY");
-
-    public void addActivities(){
-        try{
+    public void addActivities() {
+        try {
 
             //loop through all projects
             projectRepository.findAll().forEach(project -> {
@@ -53,15 +50,15 @@ public class ActivityService {
         }
     }
 
-    public void updateActivityByProjectId(String projectId){
-        try{
+    public void updateActivityByProjectId(String projectId) {
+        try {
             //get synctoken
             Optional<SyncToken> syncTokenObject = syncTokenRepository.findById(Long.valueOf(projectId));
             String syncToken = syncTokenObject.map(SyncToken::getSyncToken).orElse(null);
             boolean hasMore = false;
-            do{
+            do {
                 String encodedSyncToken = "";
-                if(syncToken != null){
+                if (syncToken != null) {
                     encodedSyncToken = URLEncoder.encode(syncToken, StandardCharsets.UTF_8);
                 }
 
@@ -79,16 +76,16 @@ public class ActivityService {
                 JSONObject jsonObject = new JSONObject(response.body());
 
                 // Extract sync and has_more values
-                syncToken = jsonObject.has("sync") ? jsonObject.getString("sync"): null;
-                if(jsonObject.has("has_more")) hasMore = jsonObject.getBoolean("has_more");
+                syncToken = jsonObject.has("sync") ? jsonObject.getString("sync") : null;
+                if (jsonObject.has("has_more")) hasMore = jsonObject.getBoolean("has_more");
 
-                if(jsonObject.has("data")) {
+                if (jsonObject.has("data")) {
                     JSONArray dataArray = jsonObject.getJSONArray("data");
 
                     for (int i = 0; i < dataArray.length(); i++) {
                         JSONObject activityObject = dataArray.getJSONObject(i);
 
-                        if(!Objects.equals(activityObject.getString("type"), "story")){
+                        if (!Objects.equals(activityObject.getString("type"), "story")) {
 
                             Activity activity = new Activity();
 
@@ -123,29 +120,24 @@ public class ActivityService {
                             activity.setProjectId(Long.valueOf(projectId));
                             activity.setTaskWeight(TaskWeightCalculation(activity));
 
-                            if(!isDuplicateActivity(activity)) activityRepository.save(activity);
+                            if (!isDuplicateActivity(activity)) activityRepository.save(activity);
                         }
                     }
                 }
-                if(jsonObject.has("errors"))
-                {
-                    if(jsonObject.getJSONArray("errors").getJSONObject(0).getString("message").equals("Sync token invalid or too old. If you are attempting to keep resources in sync, you must fetch the full dataset for this query now and use the new sync token for the next sync."))
-                    {
+                if (jsonObject.has("errors")) {
+                    if (jsonObject.getJSONArray("errors").getJSONObject(0).getString("message").equals("Sync token invalid or too old. If you are attempting to keep resources in sync, you must fetch the full dataset for this query now and use the new sync token for the next sync.")) {
                         syncToken = jsonObject.getString("sync");
                         hasMore = true;
-                    }
-                    else
-                    {
+                    } else {
                         System.out.println(jsonObject.getJSONArray("errors").getJSONObject(0).getString("message"));
                         return;
                     }
                 }
-        } while(hasMore);
+            } while (hasMore);
             SyncToken existingSyncToken = syncTokenRepository.findById(Long.valueOf(projectId)).orElse(null);
-            if(existingSyncToken != null){
+            if (existingSyncToken != null) {
                 existingSyncToken.setSyncToken(syncToken);
-            }
-            else{
+            } else {
                 syncTokenRepository.save(new SyncToken(Long.valueOf(projectId), syncToken));
             }
         } catch (Exception e) {
@@ -177,7 +169,7 @@ public class ActivityService {
         return false;
     }
 
-    private LocalDateTime convertTimeZone(String time){
+    private LocalDateTime convertTimeZone(String time) {
         // Parse the date-time string into a ZonedDateTime with UTC time zone.
         ZonedDateTime utcDateTime = ZonedDateTime.parse(
                 time,
@@ -192,7 +184,7 @@ public class ActivityService {
         return amsterdamTime.toLocalDateTime();
     }
 
-    private int TaskWeightCalculation(Activity activity){
+    private int TaskWeightCalculation(Activity activity) {
         int points = 0;
         String action = activity.getAction();
         String resourceType = activity.getResourceType();

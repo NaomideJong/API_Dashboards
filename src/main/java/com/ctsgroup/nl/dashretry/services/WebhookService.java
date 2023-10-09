@@ -1,10 +1,8 @@
 package com.ctsgroup.nl.dashretry.services;
 
-import com.ctsgroup.nl.dashretry.models.Activity;
 import com.ctsgroup.nl.dashretry.models.Webhook;
-import com.ctsgroup.nl.dashretry.repositories.WebhookRepository;
 import com.ctsgroup.nl.dashretry.repositories.ActivityRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ctsgroup.nl.dashretry.repositories.WebhookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

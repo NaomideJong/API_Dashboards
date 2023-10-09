@@ -26,8 +26,8 @@ public class TaskService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public void updateTasks(){
-        try{
+    public void updateTasks() {
+        try {
             //loop through all projects
             projectRepository.findAll().forEach(project -> {
                 //get all tasks for each project
@@ -38,57 +38,57 @@ public class TaskService {
         }
     }
 
-    public void updateTasksByProjectId(String projectId){
-        try{
+    public void updateTasksByProjectId(String projectId) {
+        try {
             int limit = 100;  // Set your desired limit
             String nextPageToken = null;
-            do{
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://app.asana.com/api/1.0/tasks?project=" + projectId
-                            + "&limit=" + limit
-                            + (nextPageToken != null ? "&offset=" + nextPageToken : "")
-                            + "&opt_fields=name,completed,custom_fields.display_value,custom_fields.name,projects,modified_at,permalink_url"))
-                    .header("accept", "application/json")
-                    .header("authorization", "Bearer 1/1205404456046809:6ea5d130ee9bba046f81c789665424d4")
-                    .method("GET", HttpRequest.BodyPublishers.noBody())
-                    .build();
-            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            do {
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("https://app.asana.com/api/1.0/tasks?project=" + projectId
+                                + "&limit=" + limit
+                                + (nextPageToken != null ? "&offset=" + nextPageToken : "")
+                                + "&opt_fields=name,completed,custom_fields.display_value,custom_fields.name,projects,modified_at,permalink_url"))
+                        .header("accept", "application/json")
+                        .header("authorization", "Bearer 1/1205404456046809:6ea5d130ee9bba046f81c789665424d4")
+                        .method("GET", HttpRequest.BodyPublishers.noBody())
+                        .build();
+                HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-            JSONObject jsonObject = new JSONObject(response.body());
+                JSONObject jsonObject = new JSONObject(response.body());
 
-            if(jsonObject.has("data")) {
-                JSONArray dataArray = jsonObject.getJSONArray("data");
+                if (jsonObject.has("data")) {
+                    JSONArray dataArray = jsonObject.getJSONArray("data");
 
-                for (int i = 0; i < dataArray.length(); i++) {
-                    JSONObject taskObject = dataArray.getJSONObject(i);
+                    for (int i = 0; i < dataArray.length(); i++) {
+                        JSONObject taskObject = dataArray.getJSONObject(i);
 
-                    Task task = new Task();
+                        Task task = new Task();
 
-                    // Check if "name" key exists before retrieving its value
-                    String name = taskObject.has("name") ? taskObject.getString("name") : "No name";
+                        // Check if "name" key exists before retrieving its value
+                        String name = taskObject.has("name") ? taskObject.getString("name") : "No name";
 
-                    //Make sure name is not over database limit
-                    if(name.length() > 255){
-                        name = name.substring(0, 255);
-                    }
-                    task.setTaskName(name);
+                        //Make sure name is not over database limit
+                        if (name.length() > 255) {
+                            name = name.substring(0, 255);
+                        }
+                        task.setTaskName(name);
 
-                    task.setId(Long.valueOf(taskObject.getString("gid")));
-                    task.setCompleted(taskObject.getBoolean("completed"));
-                    task.setUrl(taskObject.getString("permalink_url"));
-                    task.setModifiedAt(convertTimeZone(taskObject.getString("modified_at")));
+                        task.setId(Long.valueOf(taskObject.getString("gid")));
+                        task.setCompleted(taskObject.getBoolean("completed"));
+                        task.setUrl(taskObject.getString("permalink_url"));
+                        task.setModifiedAt(convertTimeZone(taskObject.getString("modified_at")));
 
-                    //check if task exists
-                    Task newTask = taskRepository.getTaskById(task.getId());
+                        //check if task exists
+                        Task newTask = taskRepository.getTaskById(task.getId());
 
-                    try {
-                        saveTask(task, newTask);
-                    } catch (Exception e) {
-                        task.setTaskName("No name: Task name invalid");
-                        saveTask(task, newTask);
+                        try {
+                            saveTask(task, newTask);
+                        } catch (Exception e) {
+                            task.setTaskName("No name: Task name invalid");
+                            saveTask(task, newTask);
+                        }
                     }
                 }
-            }
                 // Check if there's a next page token
                 if (jsonObject.has("next_page")) {
                     Object nextPageValue = jsonObject.get("next_page");
@@ -102,13 +102,13 @@ public class TaskService {
                     nextPageToken = null;
                 }
 
-        } while (nextPageToken != null);
+            } while (nextPageToken != null);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void saveTask(Task task, Task newTask){
+    private void saveTask(Task task, Task newTask) {
         if (newTask == null) {
             taskRepository.save(task);
         } else {
@@ -120,7 +120,7 @@ public class TaskService {
         }
     }
 
-    private LocalDateTime convertTimeZone(String time){
+    private LocalDateTime convertTimeZone(String time) {
         // Parse the date-time string into a ZonedDateTime with UTC time zone.
         ZonedDateTime utcDateTime = ZonedDateTime.parse(
                 time,

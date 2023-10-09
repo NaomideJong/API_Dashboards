@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class DashretryApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(DashretryApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(DashretryApplication.class, args);
+    }
 
 }

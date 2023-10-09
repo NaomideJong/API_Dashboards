@@ -1,7 +1,6 @@
 package com.ctsgroup.nl.dashretry.services;
 
 import com.ctsgroup.nl.dashretry.models.Tag;
-import com.ctsgroup.nl.dashretry.models.User;
 import com.ctsgroup.nl.dashretry.repositories.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
@@ -51,11 +50,9 @@ public class TagService {
                 }
             }
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
 
 
 //        JSONObject jsonObject = new JSONObject(response.body());

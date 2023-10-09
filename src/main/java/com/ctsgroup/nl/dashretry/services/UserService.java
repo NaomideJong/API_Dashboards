@@ -21,13 +21,11 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
-
     Dotenv dotenv = Dotenv.configure().load();
     String asanaApiKey = dotenv.get("ASANA_API_KEY");
     String everhourApiKey = dotenv.get("EVERHOUR_API_KEY");
-
+    @Autowired
+    private UserRepository userRepository;
 
     public void updateUsers() {
         try {
@@ -43,7 +41,7 @@ public class UserService {
 
             JSONObject jsonObject = new JSONObject(response.body());
 
-            if(jsonObject.has("data")) {
+            if (jsonObject.has("data")) {
                 JSONArray dataArray = jsonObject.getJSONArray("data");
 
                 for (int i = 0; i < dataArray.length(); i++) {
@@ -77,12 +75,12 @@ public class UserService {
                     }
                 }
             }
-        } catch(JSONException | IOException | InterruptedException e){
+        } catch (JSONException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private List<EverhourUser> getEverhourUserId(){
+    private List<EverhourUser> getEverhourUserId() {
         try {
             List<EverhourUser> userList = new ArrayList<>();
 
@@ -105,8 +103,7 @@ public class UserService {
             }
 
             return userList;
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

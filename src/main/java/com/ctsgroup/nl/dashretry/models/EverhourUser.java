@@ -1,6 +1,5 @@
 package com.ctsgroup.nl.dashretry.models;
 
-import jakarta.persistence.Entity;
 import lombok.*;
 
 @AllArgsConstructor

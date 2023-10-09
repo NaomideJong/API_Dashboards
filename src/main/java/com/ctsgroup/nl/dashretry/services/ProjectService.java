@@ -1,13 +1,13 @@
 package com.ctsgroup.nl.dashretry.services;
 
 import com.ctsgroup.nl.dashretry.models.Project;
+import com.ctsgroup.nl.dashretry.repositories.ProjectRepository;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
-import com.ctsgroup.nl.dashretry.repositories.ProjectRepository;
 
 import java.io.IOException;
 import java.net.URI;
@@ -23,24 +23,23 @@ import java.time.format.DateTimeFormatter;
 @Service
 public class ProjectService {
 
+    Dotenv dotenv = Dotenv.configure().load();
+    String apiKey = dotenv.get("ASANA_API_KEY");
     @Autowired
     private ProjectRepository projectRepository;
 
-    Dotenv dotenv = Dotenv.configure().load();
-    String apiKey = dotenv.get("ASANA_API_KEY");
-
     public void updateProjects() {
         try {
-                HttpRequest request = HttpRequest.newBuilder()
-                        .uri(URI.create("https://app.asana.com/api/1.0/projects?workspace=12840025534543&opt_fields=name,completed,permalink_url,created_at"))
-                        .header("accept", "application/json")
-                        .header("authorization", "Bearer " + apiKey)
-                        .method("GET", HttpRequest.BodyPublishers.noBody())
-                        .build();
-                HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://app.asana.com/api/1.0/projects?workspace=12840025534543&opt_fields=name,completed,permalink_url,created_at"))
+                    .header("accept", "application/json")
+                    .header("authorization", "Bearer " + apiKey)
+                    .method("GET", HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-                JSONObject jsonObject = new JSONObject(response.body());
-            if(jsonObject.has("data")) {
+            JSONObject jsonObject = new JSONObject(response.body());
+            if (jsonObject.has("data")) {
                 JSONArray dataArray = jsonObject.getJSONArray("data");
 
                 for (int i = 0; i < dataArray.length(); i++) {
