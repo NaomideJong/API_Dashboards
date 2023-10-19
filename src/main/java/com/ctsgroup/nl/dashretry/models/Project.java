@@ -34,4 +34,7 @@ public class Project {
     @Column(name = "url")
     private String url;
 
+    @Column(name = "owner_id")
+    private Long ownerId;
+
 }

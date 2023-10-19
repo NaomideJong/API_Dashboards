@@ -1,7 +1,9 @@
 package com.ctsgroup.nl.dashretry.services;
 
 import com.ctsgroup.nl.dashretry.models.Project;
+import com.ctsgroup.nl.dashretry.models.User;
 import com.ctsgroup.nl.dashretry.repositories.ProjectRepository;
+import com.ctsgroup.nl.dashretry.repositories.UserRepository;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
@@ -28,10 +30,13 @@ public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public void updateProjects() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://app.asana.com/api/1.0/projects?workspace=12840025534543&opt_fields=name,completed,permalink_url,created_at"))
+                    .uri(URI.create("https://app.asana.com/api/1.0/projects?workspace=12840025534543&opt_fields=name,completed,permalink_url,created_at,owner"))
                     .header("accept", "application/json")
                     .header("authorization", "Bearer " + apiKey)
                     .method("GET", HttpRequest.BodyPublishers.noBody())
@@ -66,16 +71,30 @@ public class ProjectService {
                     project.setCompleted(projectObject.getBoolean("completed"));
                     project.setUrl(projectObject.getString("permalink_url"));
 
-                    Project newProject = projectRepository.getProjectById(project.getId());
+                    //Check if owner is present in json
+                    if (!projectObject.isNull("owner")) {
+                        JSONObject ownerObject = projectObject.getJSONObject("owner");
+                        project.setOwnerId(Long.valueOf(ownerObject.getString("gid")));
+                    }
 
-                    if (newProject == null) {
+                    //Check if owner is present in db
+                    User owner = userRepository.getUserById(project.getOwnerId());
+                    if (owner == null) {
+                        project.setOwnerId(0L);
+                    }
+
+                    Project existingProject = projectRepository.getProjectById(project.getId());
+
+
+                    if (existingProject == null) {
                         projectRepository.save(project);
                     } else {
-                        newProject.setProjectName(project.getProjectName());
-                        newProject.setCreatedAt(project.getCreatedAt());
-                        newProject.setCompleted(project.getCompleted());
-                        newProject.setUrl(project.getUrl());
-                        projectRepository.save(newProject);
+                        existingProject.setProjectName(project.getProjectName());
+                        existingProject.setCreatedAt(project.getCreatedAt());
+                        existingProject.setCompleted(project.getCompleted());
+                        existingProject.setUrl(project.getUrl());
+                        existingProject.setOwnerId(project.getOwnerId());
+                        projectRepository.save(existingProject);
                     }
                 }
             }

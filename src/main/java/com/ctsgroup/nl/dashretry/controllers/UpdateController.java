@@ -1,9 +1,6 @@
 package com.ctsgroup.nl.dashretry.controllers;
 
-import com.ctsgroup.nl.dashretry.services.ActivityService;
-import com.ctsgroup.nl.dashretry.services.ProjectService;
-import com.ctsgroup.nl.dashretry.services.UserService;
-import com.ctsgroup.nl.dashretry.services.WebhookService;
+import com.ctsgroup.nl.dashretry.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,13 +20,13 @@ public class UpdateController {
     private ProjectService projectService;
 
     @Autowired
-    private ActivityService activityService;
+    private UpdateActivitiesAndTimesService activityService;
 
     @GetMapping
     public String getWebhook() {
         userService.updateUsers();
         projectService.updateProjects();
-        activityService.addActivities();
+        activityService.updateActivitiesAndTimes();
         return webhookService.getWebhook();
     }
 

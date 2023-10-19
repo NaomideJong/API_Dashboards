@@ -1,12 +1,11 @@
 package com.ctsgroup.nl.dashretry.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,10 +14,12 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Builder
-@Table(name = "ProjectTimes")
+@Table(name = "project_times")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProjectTime {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
@@ -26,9 +27,10 @@ public class ProjectTime {
     private Long projectId;
 
     @Column(name = "date")
-    private LocalDateTime date;
+    @JsonProperty("date")
+    private LocalDate date;
 
     @Column(name = "time")
-    private int time; //time.total, in seconds
+    private int time; //in seconds
 
 }
