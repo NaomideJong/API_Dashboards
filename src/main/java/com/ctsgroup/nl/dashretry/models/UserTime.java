@@ -30,7 +30,7 @@ public class UserTime {
     private LocalDate date;
 
     @Column(name = "time")
-    private int time; //time.total, in seconds
+    private int time; //in seconds
 
 }
 

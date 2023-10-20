@@ -52,9 +52,8 @@ public class UserService {
                     user.setName(userObject.getString("name"));
 
                     // Check if email exists
-                    if (!userObject.isNull("email")) {
-                        user.setEmail(userObject.getString("email"));
-                    }
+                    if (!userObject.isNull("email")) user.setEmail(userObject.getString("email"));
+
 
                     //compare email to the everhouruser list and add the everhour id to the user
                     for (EverhourUser everhourUser : everhourUserList) {

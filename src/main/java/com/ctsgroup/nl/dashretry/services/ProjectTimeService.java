@@ -32,7 +32,6 @@ public class ProjectTimeService {
 
     public void updateEverhourProjectTime(String projectId){
         try{
-
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://api.everhour.com/projects/as:" + projectId + "/time?from=" + recentDate))
                     .header("accept", "application/json")

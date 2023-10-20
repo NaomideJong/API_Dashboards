@@ -32,19 +32,11 @@ public class ActivityService {
 
     Dotenv dotenv = Dotenv.configure().load();
     String apiKey = dotenv.get("ASANA_API_KEY");
-    String everhourApiKey = dotenv.get("EVERHOUR_API_KEY");
-
-    String recentDate = LocalDate.now().minusDays(14).toString();
 
     @Autowired
     private ActivityRepository activityRepository;
     @Autowired
     private SyncTokenRepository syncTokenRepository;
-    @Autowired
-    private ProjectTimeRepository projectTimeRepository;
-
-
-
 
     public void updateActivityByProjectId(String projectId) {
         try {
