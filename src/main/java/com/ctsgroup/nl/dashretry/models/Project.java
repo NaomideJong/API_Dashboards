@@ -36,5 +36,4 @@ public class Project {
 
     @Column(name = "owner_id")
     private Long ownerId;
-
 }
