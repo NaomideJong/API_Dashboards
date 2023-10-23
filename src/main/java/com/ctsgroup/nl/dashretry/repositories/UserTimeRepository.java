@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface UserTimeRepository extends BaseRepository<UserTime, Long, JpaSpecificationExecutor<UserTime>> {
-    Optional<UserTime> findTopByUserIdAndDateAndProjectId(Long userId, LocalDate date, Long projectId);
+    Optional<UserTime> findTopByUserIdAndDateAndTaskId(Long userId, LocalDate date, String taskId);
 }

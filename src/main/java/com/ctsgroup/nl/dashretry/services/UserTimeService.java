@@ -34,7 +34,7 @@ public class UserTimeService {
     public void updateUserTimeByUser(String everhourUserId){
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.everhour.com/users/" + everhourUserId + "/time?from=" + recentDate))
+                    .uri(URI.create("https://api.everhour.com/users/" + everhourUserId + "/time?"))//from=" + recentDate))
                     .header("accept", "application/json")
                     .header("X-Api-Key", everhourApiKey)
                     .method("GET", HttpRequest.BodyPublishers.noBody())
@@ -65,7 +65,7 @@ public class UserTimeService {
 
     private void saveUserTime(UserTime userTime){
         //get UserTime from database by userId, date and projectId
-        Optional<UserTime> duplicateUserTime = userTimeRepository.findTopByUserIdAndDateAndProjectId(userTime.getUserId(), userTime.getDate(), userTime.getProjectId());
+        Optional<UserTime> duplicateUserTime = userTimeRepository.findTopByUserIdAndDateAndTaskId(userTime.getUserId(), userTime.getDate(), userTime.getTaskId());
 
         if(duplicateUserTime.isPresent()){
             duplicateUserTime.ifPresent(newUserTime -> {
@@ -93,6 +93,17 @@ public class UserTimeService {
         //remove as: prefix from project id before setting the Project ID
         String projectId = projectIds.getString(j).replace("as:", "");
         userTime.setProjectId(Long.valueOf(projectId));
+
+        if(jsonObject.has("task")) {
+            JSONObject task = jsonObject.getJSONObject("task");
+            userTime.setTaskId(task.getString("id").replace("as:", ""));
+            //cut string at 255 characters and make sure there are no weird characters
+            if(task.getString("name").length() > 255){
+                userTime.setTaskName(task.getString("name").substring(0, 255).replaceAll("[^\\x00-\\x7F]", ""));
+            } else {
+                userTime.setTaskName(task.getString("name").replaceAll("[^\\x00-\\x7F]", ""));
+            }
+        }
 
         return userTime;
     }

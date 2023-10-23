@@ -32,5 +32,11 @@ public class UserTime {
     @Column(name = "time")
     private int time; //in seconds
 
+    @Column(name = "task_id")
+    private String taskId;
+
+    @Column(name = "task_name")
+    private String taskName;
+
 }
 
