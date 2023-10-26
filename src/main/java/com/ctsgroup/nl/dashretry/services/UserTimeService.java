@@ -34,7 +34,7 @@ public class UserTimeService {
     public void updateUserTimeByUser(String everhourUserId){
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://api.everhour.com/users/" + everhourUserId + "/time?"))//from=" + recentDate))
+                    .uri(URI.create("https://api.everhour.com/users/" + everhourUserId + "/time?from=" + recentDate))
                     .header("accept", "application/json")
                     .header("X-Api-Key", everhourApiKey)
                     .method("GET", HttpRequest.BodyPublishers.noBody())
