@@ -53,21 +53,7 @@ public class ProjectService {
                     Project project = new Project();
                     project.setId(Long.valueOf(projectObject.getString("gid")));
                     project.setProjectName(projectObject.getString("name"));
-
-                    // Parse the date-time string into a ZonedDateTime with UTC time zone.
-                    ZonedDateTime utcDateTime = ZonedDateTime.parse(
-                            projectObject.getString("created_at"),
-                            DateTimeFormatter.ISO_OFFSET_DATE_TIME
-                    );
-
-                    // Convert to Amsterdam time zone.
-                    ZoneId amsterdamZone = ZoneId.of("Europe/Amsterdam");
-                    ZonedDateTime amsterdamTime = utcDateTime.withZoneSameInstant(amsterdamZone);
-
-                    // Convert to LocalDateTime
-                    LocalDateTime amsterdamLocalDateTime = amsterdamTime.toLocalDateTime();
-
-                    project.setCreatedAt(amsterdamLocalDateTime);
+                    project.setCreatedAt(convertTimeZone(projectObject.getString("created_at")));
                     project.setCompleted(projectObject.getBoolean("completed"));
                     project.setUrl(projectObject.getString("permalink_url"));
 
@@ -101,5 +87,20 @@ public class ProjectService {
         } catch (IOException | InterruptedException | JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private LocalDateTime convertTimeZone(String time) {
+        // Parse the date-time string into a ZonedDateTime with UTC time zone.
+        ZonedDateTime utcDateTime = ZonedDateTime.parse(
+                time,
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME
+        );
+
+        // Convert to Amsterdam time zone.
+        ZoneId amsterdamZone = ZoneId.of("Europe/Amsterdam");
+        ZonedDateTime amsterdamTime = utcDateTime.withZoneSameInstant(amsterdamZone);
+
+        // Return the LocalDateTime in Amsterdam time zone
+        return amsterdamTime.toLocalDateTime();
     }
 }

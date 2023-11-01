@@ -61,11 +61,9 @@ public class ProjectTimeService {
         Optional<ProjectTime> latestProjectTime = projectTimeRepository.findTopByProjectIdAndDate(projectTime.getProjectId(), projectTime.getDate());
 
         if (latestProjectTime.isPresent()) {
-            latestProjectTime.ifPresent(newProjectTime -> {
-                newProjectTime.setDate(projectTime.getDate());
-                newProjectTime.setTime(projectTime.getTime());
-                projectTimeRepository.save(newProjectTime);
-            });
+            int newTime = latestProjectTime.get().getTime() + projectTime.getTime();
+            latestProjectTime.get().setTime(newTime);
+            projectTimeRepository.save(latestProjectTime.get());
         } else {
             projectTimeRepository.save(projectTime);
         }

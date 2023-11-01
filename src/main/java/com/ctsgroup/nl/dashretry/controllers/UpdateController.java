@@ -14,7 +14,7 @@ public class UpdateController {
     private WebhookService webhookService;
 
     @Autowired
-    private UserService userService;
+    private AsanaUserService asanaUserService;
 
     @Autowired
     private ProjectService projectService;
@@ -24,8 +24,8 @@ public class UpdateController {
 
     @GetMapping
     public String getWebhook() {
-        userService.updateUsers();
         projectService.updateProjects();
+        asanaUserService.updateUsers();
         activityService.updateActivitiesAndTimes();
         return webhookService.getWebhook();
     }

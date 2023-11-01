@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserService {
+public class AsanaUserService {
 
     Dotenv dotenv = Dotenv.configure().load();
     String asanaApiKey = dotenv.get("ASANA_API_KEY");
