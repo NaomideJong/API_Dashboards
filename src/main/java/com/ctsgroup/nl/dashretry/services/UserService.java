@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,11 +20,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class AsanaUserService {
+public class UserService {
 
-    Dotenv dotenv = Dotenv.configure().load();
+    Dotenv dotenv = Dotenv.configure().filename("/.env").load();
+
     String asanaApiKey = dotenv.get("ASANA_API_KEY");
     String everhourApiKey = dotenv.get("EVERHOUR_API_KEY");
+
     @Autowired
     private UserRepository userRepository;
 

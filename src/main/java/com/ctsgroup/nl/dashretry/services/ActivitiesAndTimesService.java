@@ -4,12 +4,13 @@ import com.ctsgroup.nl.dashretry.models.User;
 import com.ctsgroup.nl.dashretry.repositories.ProjectRepository;
 import com.ctsgroup.nl.dashretry.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class UpdateActivitiesAndTimesService {
+public class ActivitiesAndTimesService {
     @Autowired
     private ProjectRepository projectRepository;
 
