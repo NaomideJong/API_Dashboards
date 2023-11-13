@@ -1,16 +1,10 @@
 package com.ctsgroup.nl.dashretry.services;
 
 import com.ctsgroup.nl.dashretry.models.Webhook;
-import com.ctsgroup.nl.dashretry.repositories.ActivityRepository;
 import com.ctsgroup.nl.dashretry.repositories.WebhookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 
 @Service

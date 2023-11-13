@@ -5,11 +5,10 @@ import com.ctsgroup.nl.dashretry.models.User;
 import com.ctsgroup.nl.dashretry.repositories.ProjectRepository;
 import com.ctsgroup.nl.dashretry.repositories.UserRepository;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
-import org.springframework.stereotype.Component;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

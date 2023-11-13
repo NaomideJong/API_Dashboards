@@ -5,10 +5,9 @@ import com.ctsgroup.nl.dashretry.models.User;
 import com.ctsgroup.nl.dashretry.repositories.UserRepository;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
-import org.springframework.stereotype.Component;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,8 +21,7 @@ import java.util.List;
 @Service
 public class UserService {
 
-    Dotenv dotenv = Dotenv.configure().filename("/.env").load();
-
+    Dotenv dotenv = Dotenv.configure().load();
     String asanaApiKey = dotenv.get("ASANA_API_KEY");
     String everhourApiKey = dotenv.get("EVERHOUR_API_KEY");
 
@@ -98,7 +96,7 @@ public class UserService {
             for (int i = 0; i < jsonArray.length(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                Long id = Long.valueOf(jsonObject.getString("id"));
+                Long id = (long) jsonObject.getInt("id");
                 String email = jsonObject.getString("email");
 
                 userList.add(new EverhourUser(id, email));

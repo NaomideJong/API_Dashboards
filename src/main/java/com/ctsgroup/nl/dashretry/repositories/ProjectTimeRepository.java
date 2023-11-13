@@ -9,5 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface ProjectTimeRepository extends BaseRepository<ProjectTime, Long, JpaSpecificationExecutor<ProjectTime>>{
-    Optional<ProjectTime> findTopByProjectIdAndDate(Long projectId, LocalDate date);
+    Optional<ProjectTime> findTopByProjectIdAndDateAndTaskId(Long projectId, LocalDate date, String taskId);
 }

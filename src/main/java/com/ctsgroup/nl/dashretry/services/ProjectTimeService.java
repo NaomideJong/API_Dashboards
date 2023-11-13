@@ -1,17 +1,12 @@
 package com.ctsgroup.nl.dashretry.services;
 
-import com.ctsgroup.nl.dashretry.models.*;
 import com.ctsgroup.nl.dashretry.repositories.*;
 import com.ctsgroup.nl.dashretry.models.ProjectTime;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
-import org.springframework.stereotype.Component;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -41,15 +36,30 @@ public class ProjectTimeService {
                     .build();
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
 
-            //check if status code is 200 and that the body isn't empty
-            if(response.statusCode() == 200 && !response.body().equals("[]")) {
-                JSONArray jsonArray = new JSONArray(response.body());
+            //check if status code is 200 and that the body isn't empty and is an array
+            if (response.statusCode() == 200 && !response.body().equals("[]")) {
+                String responseBody = response.body();
 
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                if (responseBody.startsWith("[")) {
+                    // It's an array
+                    JSONArray jsonArray = new JSONArray(responseBody);
 
-                    ProjectTime projectTime = setProjectTime(jsonObject, projectId);
-                    saveProjectTime(projectTime);
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                        ProjectTime projectTime = setProjectTime(jsonObject, projectId);
+                        saveProjectTime(projectTime);
+                    }
+                } else if (responseBody.startsWith("{")) {
+                    // It's a JSON object
+                    JSONObject jsonObject = new JSONObject(responseBody);
+
+                        ProjectTime projectTime = setProjectTime(jsonObject, projectId);
+                        saveProjectTime(projectTime);
+
+                } else {
+                    // Handle other cases or log a warning
+                    System.out.println("Unexpected response format: " + responseBody);
                 }
             }
         } catch (Exception e) {
@@ -59,11 +69,10 @@ public class ProjectTimeService {
 
     private void saveProjectTime(ProjectTime projectTime){
         //get last date from database
-        Optional<ProjectTime> latestProjectTime = projectTimeRepository.findTopByProjectIdAndDate(projectTime.getProjectId(), projectTime.getDate());
+        Optional<ProjectTime> latestProjectTime = projectTimeRepository.findTopByProjectIdAndDateAndTaskId(projectTime.getProjectId(), projectTime.getDate(), projectTime.getTaskId());
 
         if (latestProjectTime.isPresent()) {
-            int newTime = latestProjectTime.get().getTime() + projectTime.getTime();
-            latestProjectTime.get().setTime(newTime);
+            latestProjectTime.get().setTime(projectTime.getTime());
             projectTimeRepository.save(latestProjectTime.get());
         } else {
             projectTimeRepository.save(projectTime);
@@ -79,6 +88,17 @@ public class ProjectTimeService {
             projectTime.setDate(date);
 
             projectTime.setTime(jsonObject.getInt("time"));
+
+            if(jsonObject.has("task")) {
+                JSONObject task = jsonObject.getJSONObject("task");
+                projectTime.setTaskId(task.getString("id").replace("as:", ""));
+                //cut string at 255 characters and make sure there are no weird characters
+                if(task.getString("name").length() > 255){
+                    projectTime.setTaskName(task.getString("name").substring(0, 255).replaceAll("[^\\x00-\\x7F]", ""));
+                } else {
+                    projectTime.setTaskName(task.getString("name").replaceAll("[^\\x00-\\x7F]", ""));
+                }
+            }
 
             return projectTime;
 
