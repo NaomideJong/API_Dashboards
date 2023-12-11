@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -36,4 +37,16 @@ public class Project {
 
     @Column(name = "owner_id")
     private Long ownerId;
+
+    @Column(name = "due_date")
+    private LocalDate dueDate;
+
+    @Column (name = "team_id")
+    private Long teamId;
+
+    @Column (name = "team_name")
+    private String teamName;
+
+    @Column (name = "color")
+    private String color;
 }

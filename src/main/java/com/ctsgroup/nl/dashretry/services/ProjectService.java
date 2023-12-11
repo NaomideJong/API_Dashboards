@@ -16,6 +16,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -36,7 +37,7 @@ public class ProjectService {
     public void updateProjects() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create("https://app.asana.com/api/1.0/projects?workspace=12840025534543&opt_fields=name,completed,permalink_url,created_at,owner"))
+                    .uri(URI.create("https://app.asana.com/api/1.0/projects?workspace=12840025534543&opt_fields=name,completed,permalink_url,created_at,owner,due_date,team.name,color"))
                     .header("accept", "application/json")
                     .header("authorization", "Bearer " + apiKey)
                     .method("GET", HttpRequest.BodyPublishers.noBody())
@@ -56,6 +57,22 @@ public class ProjectService {
                     project.setCreatedAt(convertTimeZone(projectObject.getString("created_at")));
                     project.setCompleted(projectObject.getBoolean("completed"));
                     project.setUrl(projectObject.getString("permalink_url"));
+                    project.setColor(projectObject.optString("color", null));
+
+                    JSONObject teamObject = projectObject.getJSONObject("team");
+                    if(teamObject.has("gid") && teamObject.has("name")){
+                        project.setTeamId(Long.valueOf(teamObject.getString("gid")));
+                        project.setTeamName(teamObject.getString("name"));
+                    }
+                    else {
+                        project.setTeamId(0L);
+                        project.setTeamName("No team");
+                    }
+
+                    if (!projectObject.isNull("due_date")) {
+                        project.setDueDate(LocalDate.parse(projectObject.getString("due_date"), DateTimeFormatter.ISO_DATE));
+                    }
+                    else project.setDueDate(null);
 
                     //Check if owner is present in json
                     if (!projectObject.isNull("owner")) {
@@ -71,7 +88,6 @@ public class ProjectService {
 
                     Project existingProject = projectRepository.getProjectById(project.getId());
 
-
                     if (existingProject == null) {
                         projectRepository.save(project);
                     } else {
@@ -80,6 +96,10 @@ public class ProjectService {
                         existingProject.setCompleted(project.getCompleted());
                         existingProject.setUrl(project.getUrl());
                         existingProject.setOwnerId(project.getOwnerId());
+                        existingProject.setDueDate(project.getDueDate());
+                        existingProject.setTeamId(project.getTeamId());
+                        existingProject.setTeamName(project.getTeamName());
+                        existingProject.setColor(project.getColor());
                         projectRepository.save(existingProject);
                     }
                 }
