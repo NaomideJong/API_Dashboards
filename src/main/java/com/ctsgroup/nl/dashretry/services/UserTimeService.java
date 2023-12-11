@@ -50,8 +50,7 @@ public class UserTimeService {
                     JSONArray projectIds = setProjectIds(jsonObject);
 
                     //loop through array of project id's
-                    for(int j = 0; j < Objects.requireNonNull(projectIds).length(); j++){
-
+                    for(int j = 0; j < projectIds.length(); j++){
                         UserTime userTime = setUserTime(jsonObject, everhourUserId, projectIds, j);
                         saveUserTime(userTime);
 
@@ -91,8 +90,13 @@ public class UserTimeService {
         userTime.setDate(LocalDate.parse(jsonObject.getString("date")));
         userTime.setTime(jsonObject.getInt("time"));
         //remove as: prefix from project id before setting the Project ID
-        String projectId = projectIds.getString(j).replace("as:", "");
-        userTime.setProjectId(Long.valueOf(projectId));
+        Object projectIdObject = projectIds.get(j);
+        if (projectIdObject instanceof String) {
+            String projectId = ((String) projectIdObject).replace("as:", "");
+            userTime.setProjectId(Long.valueOf(projectId));
+        } else {
+            userTime.setProjectId(0L);
+        }
 
         if(jsonObject.has("task")) {
             JSONObject task = jsonObject.getJSONObject("task");
